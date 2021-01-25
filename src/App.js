@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -12,6 +14,25 @@ import {
 import './App.css';
 
 function App() {
+  const [wallet, setWallet] = useState('');
+  const [startBlock, setStartBlock] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+
+  const apikey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
+
+  const getTransactions = async (wallet, startBlock) => {
+    try {
+      const { data } = await axios.get(
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
+      );
+      setTransactions(data.result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  console.log(transactions);
+
   return (
     <Box p={3} pt={0}>
       <Flex>
@@ -23,10 +44,7 @@ function App() {
       <Flex pt={4}>
         <Box width={1} height={'10vh'} m={1}>
           <Field label='Showing transactions for...'>
-            <EthAddress
-              address='0x9505C8Fc1aD98b0aC651b91245d02D055fEc8E49'
-              required
-            />
+            <EthAddress address={wallet} required />
           </Field>
         </Box>
         <Box width={1} height={'10vh'} m={1}>
@@ -36,13 +54,24 @@ function App() {
               required
               placeholder='e.g. 0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f'
               mr={2}
+              onChange={e => setWallet(e.target.value)}
             />
           </Field>
-          <Field label='Start Block'>
-            <Input type='number' required placeholder='e.g. 9000000' mr={1} />
+          <Field label='Start Block (default 0)'>
+            <Input
+              type='number'
+              required
+              placeholder='e.g. 9000000'
+              mr={1}
+              onChange={e => setStartBlock(e.target.value)}
+            />
           </Field>
           <Field label=' '>
-            <Button required mt={1}>
+            <Button
+              required
+              mt={1}
+              onClick={() => getTransactions(wallet, startBlock)}
+            >
               Get Transactions
             </Button>
           </Field>
@@ -54,30 +83,22 @@ function App() {
           <thead>
             <tr>
               <th>Transaction hash</th>
+              <th>From</th>
+              <th>To</th>
               <th>Value</th>
-              <th>Recipient</th>
-              <th>Time</th>
+              <th>Txn Fee</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>0xeb...cc0</td>
-              <td>0.10 ETH</td>
-              <td>0x4fe...581</td>
-              <td>March 28 2019 08:47:17 AM +UTC</td>
-            </tr>
-            <tr>
-              <td>0xsb...230</td>
-              <td>0.11 ETH</td>
-              <td>0x4gj...1e1</td>
-              <td>March 28 2019 08:52:17 AM +UTC</td>
-            </tr>
-            <tr>
-              <td>0xed...c40</td>
-              <td>0.12 ETH</td>
-              <td>0x3fd...781</td>
-              <td>March 28 2019 08:55:17 AM +UTC</td>
-            </tr>
+            {transactions.map(txn => (
+              <tr>
+                <td>{txn.hash}</td>
+                <td>{txn.from}</td>
+                <td>{txn.to}</td>
+                <td>{txn.value}</td>
+                <td>{txn.gasUsed}</td>
+              </tr>
+            ))}
           </tbody>
         </Table>
       </Box>
