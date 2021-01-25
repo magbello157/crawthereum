@@ -39,9 +39,13 @@ function App() {
             />
           </Field>
           <Field label='Start Block'>
-            <Input type='number' required placeholder='e.g. 9000000' />
+            <Input type='number' required placeholder='e.g. 9000000' mr={1} />
           </Field>
-          <Button>Get Transactions</Button>
+          <Field label=' '>
+            <Button required mt={1}>
+              Get Transactions
+            </Button>
+          </Field>
         </Box>
       </Flex>
 
