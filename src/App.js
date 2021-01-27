@@ -8,7 +8,8 @@ import {
   Flex,
   Heading,
   Input,
-  Text
+  Text,
+  Loader
 } from 'rimble-ui';
 import CrawthTable from './components/CrawthTable';
 import './App.css';
@@ -17,17 +18,21 @@ function App() {
   const [wallet, setWallet] = useState('');
   const [startBlock, setStartBlock] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const apikey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
 
   const getTransactions = async (wallet, startBlock) => {
     try {
+      setLoading(true);
       const { data } = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
       );
       setTransactions(data.result);
+      setLoading(false);
     } catch (e) {
       console.log(e);
+      setLoading(false);
     }
   };
 
@@ -77,7 +82,19 @@ function App() {
       </Flex>
 
       <Box width={1} height={'75vh'} m={1}>
-        <CrawthTable data={transactions} />
+        {loading ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '250px'
+            }}
+          >
+            <Loader size='80px' />
+          </div>
+        ) : (
+          <CrawthTable data={transactions} />
+        )}
       </Box>
     </Box>
   );
