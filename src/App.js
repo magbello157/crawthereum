@@ -8,9 +8,9 @@ import {
   Flex,
   Heading,
   Input,
-  Table,
   Text
 } from 'rimble-ui';
+import CrawthTable from './components/CrawthTable';
 import './App.css';
 
 function App() {
@@ -30,8 +30,6 @@ function App() {
       console.log(e);
     }
   };
-
-  console.log(transactions);
 
   return (
     <Box p={3} pt={0}>
@@ -79,28 +77,7 @@ function App() {
       </Flex>
 
       <Box width={1} height={'75vh'} m={1}>
-        <Table>
-          <thead>
-            <tr>
-              <th>Transaction hash</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Value</th>
-              <th>Txn Fee</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(txn => (
-              <tr>
-                <td>{txn.hash}</td>
-                <td>{txn.from}</td>
-                <td>{txn.to}</td>
-                <td>{txn.value}</td>
-                <td>{txn.gasUsed}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <CrawthTable data={transactions} />
       </Box>
     </Box>
   );
