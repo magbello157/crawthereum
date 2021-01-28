@@ -14,19 +14,19 @@ const columns = [
   { id: 'from', label: 'From', minWidth: 100 },
   {
     id: 'to',
-    label: 'To Title',
+    label: 'To',
     minWidth: 170,
     align: 'center'
   },
   {
     id: 'value',
-    label: 'Value Title',
+    label: 'Value',
     minWidth: 170,
     align: 'Center'
   },
   {
     id: 'fee',
-    label: 'Fee Title',
+    label: 'Txn Fee',
     minWidth: 170,
     align: 'Center'
   }
