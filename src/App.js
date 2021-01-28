@@ -9,7 +9,8 @@ import {
   Heading,
   Input,
   Text,
-  Loader
+  Loader,
+  ToastMessage
 } from 'rimble-ui';
 import CrawthTable from './components/CrawthTable';
 import './App.css';
@@ -19,20 +20,26 @@ function App() {
   const [startBlock, setStartBlock] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const apikey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
 
   const getTransactions = async (wallet, startBlock) => {
     try {
       setLoading(true);
+      setErrorMsg('');
       const { data } = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
       );
-      setTransactions(data.result);
+      if (Array.isArray(data.result)) {
+        setTransactions(data.result);
+      } else {
+        throw data.result;
+      }
       setLoading(false);
     } catch (e) {
-      console.log(e);
       setLoading(false);
+      setErrorMsg(e);
     }
   };
 
@@ -83,6 +90,13 @@ function App() {
       </Flex>
 
       <Box width={1} height={'75vh'} m={1}>
+        {errorMsg ? (
+          <ToastMessage.Failure
+            my={3}
+            message={errorMsg}
+            secondaryMessage={'Please provide a valid wallet address'}
+          />
+        ) : null}
         {loading ? (
           <div
             style={{
