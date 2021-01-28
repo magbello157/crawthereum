@@ -73,6 +73,7 @@ function App() {
             <Button
               required
               mt={1}
+              disabled={wallet.length < 1}
               onClick={() => getTransactions(wallet, startBlock)}
             >
               Get Transactions
