@@ -30,6 +30,7 @@ function App() {
       setLoading(true);
       setErrorMsg('');
       setQueriedWallet('');
+      setTransactions([]);
       const { data } = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
       );
