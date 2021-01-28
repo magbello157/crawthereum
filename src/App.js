@@ -17,6 +17,7 @@ import './App.css';
 
 function App() {
   const [wallet, setWallet] = useState('');
+  const [queriedWallet, setQueriedWallet] = useState('');
   const [startBlock, setStartBlock] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,11 +29,13 @@ function App() {
     try {
       setLoading(true);
       setErrorMsg('');
+      setQueriedWallet('');
       const { data } = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
       );
       if (Array.isArray(data.result)) {
         setTransactions(data.result);
+        setQueriedWallet(wallet);
       } else {
         throw data.result;
       }
@@ -54,7 +57,7 @@ function App() {
       <Flex pt={4}>
         <Box width={1} height={'10vh'} m={1}>
           <Field label='Showing transactions for...'>
-            <EthAddress address={wallet} required />
+            <EthAddress address={queriedWallet} required />
           </Field>
         </Box>
         <Box width={1} height={'10vh'} m={1}>
