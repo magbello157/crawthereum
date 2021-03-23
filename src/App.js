@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -13,9 +12,10 @@ import {
   ToastMessage
 } from 'rimble-ui';
 import CrawthTable from './components/CrawthTable';
+import axios from 'axios';
 import './App.css';
 
-function App() {
+const App = () => {
   const [wallet, setWallet] = useState('');
   const [queriedWallet, setQueriedWallet] = useState('');
   const [startBlock, setStartBlock] = useState(0);
@@ -23,7 +23,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const apikey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
+  const apiKey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
 
   const getTransactions = async (wallet, startBlock) => {
     try {
@@ -32,7 +32,7 @@ function App() {
       setQueriedWallet('');
       setTransactions([]);
       const { data } = await axios.get(
-        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apikey}`
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apiKey}`
       );
       if (Array.isArray(data.result)) {
         setTransactions(data.result);
@@ -84,7 +84,7 @@ function App() {
             <Button
               required
               mt={1}
-              disabled={wallet.length < 1}
+              disabled={!wallet || loading}
               onClick={() => getTransactions(wallet, startBlock)}
             >
               Get Transactions
@@ -117,6 +117,6 @@ function App() {
       </Box>
     </Box>
   );
-}
+};
 
 export default App;
