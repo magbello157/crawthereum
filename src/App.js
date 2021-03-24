@@ -23,7 +23,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const apiKey = '9YCZZ8A9RH2DBSQP9VEPRHIBJCR1R3BRR7';
+  const apiKey = process.env.REACT_APP_API_KEY;
 
   const getTransactions = async (wallet, startBlock) => {
     try {
