@@ -32,7 +32,7 @@ const App = () => {
       setQueriedWallet('');
       setTransactions([]);
       const { data } = await axios.get(
-        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=99999999&sort=asc&apikey=${apiKey}`
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=latest&sort=asc&apikey=${apiKey}`
       );
       if (data.status === '1') {
         setTransactions(data.result);
