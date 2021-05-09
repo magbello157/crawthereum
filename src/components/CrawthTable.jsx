@@ -10,6 +10,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 
 const columns = [
+  { id: 'blockNumber', label: 'Block', minWidth: 100 },
   { id: 'hash', label: 'Transaction Hash', minWidth: 170 },
   { id: 'from', label: 'From', minWidth: 100 },
   {
@@ -32,8 +33,8 @@ const columns = [
   }
 ];
 
-function createData(hash, from, to, value, fee) {
-  return { hash, from, to, value, fee };
+function createData(blockNumber, hash, from, to, value, fee) {
+  return { blockNumber, hash, from, to, value, fee };
 }
 
 const useStyles = makeStyles({
@@ -51,7 +52,7 @@ function StickyHeadTable({ data }) {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const rows = data.map(txn => {
-    return createData(txn.hash, txn.from, txn.to, txn.value, txn.gasUsed);
+    return createData(txn.blockNumber, txn.hash, txn.from, txn.to, txn.value, txn.gasUsed);
   });
 
   const handleChangePage = (event, newPage) => {

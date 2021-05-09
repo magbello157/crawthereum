@@ -57,30 +57,30 @@ const App = () => {
       </Flex>
       <Flex pt={4}>
         <Box width={1} height={'10vh'} m={1}>
-          <Field label='Showing transactions for...'>
+          <Field label="Showing transactions for...">
             <EthAddress address={queriedWallet} required />
           </Field>
         </Box>
         <Box width={1} height={'10vh'} m={1}>
-          <Field label='Wallet Address'>
+          <Field label="Wallet Address">
             <Input
-              type='text'
+              type="text"
               required
-              placeholder='e.g. 0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f'
+              placeholder="e.g. 0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f"
               mr={2}
               onChange={e => setWallet(e.target.value)}
             />
           </Field>
-          <Field label='Start Block (default 0)'>
+          <Field label="Start Block (default 0)">
             <Input
-              type='number'
+              type="number"
               required
-              placeholder='e.g. 9000000'
+              placeholder="e.g. 9000000"
               mr={1}
               onChange={e => setStartBlock(e.target.value)}
             />
           </Field>
-          <Field label=' '>
+          <Field label=" ">
             <Button
               required
               mt={1}
@@ -109,7 +109,7 @@ const App = () => {
               marginTop: '250px'
             }}
           >
-            <Loader size='80px' />
+            <Loader size="80px" />
           </div>
         ) : (
           <CrawthTable data={transactions} />
