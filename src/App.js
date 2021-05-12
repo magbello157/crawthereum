@@ -7,9 +7,7 @@ import {
   Flex,
   Heading,
   Input,
-  Text,
-  Loader,
-  ToastMessage
+  Text
 } from 'rimble-ui';
 import CrawthTable from './components/CrawthTable';
 import axios from 'axios';
@@ -20,30 +18,39 @@ const App = () => {
   const [queriedWallet, setQueriedWallet] = useState('');
   const [startBlock, setStartBlock] = useState(0);
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  let lastTransactionHash = '';
+  let nextStartBlock = 0;
 
   const apiKey = process.env.REACT_APP_API_KEY;
 
   const getTransactions = async (wallet, startBlock) => {
     try {
-      setLoading(true);
-      setErrorMsg('');
-      setQueriedWallet('');
-      setTransactions([]);
       const { data } = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=latest&sort=asc&apikey=${apiKey}`
       );
-      if (data.status === '1') {
-        setTransactions(data.result);
+
+      if (data.status === '1' && data.message === 'OK') {
+        const lastTransactionIdx = data.result.length - 1;
+
+        if (lastTransactionHash === data.result[lastTransactionIdx].hash) {
+          alert('data fetch completed!');
+          return;
+        }
+
+        setTransactions(transactions => [...transactions, ...data.result]);
         setQueriedWallet(wallet);
+        lastTransactionHash = data.result[lastTransactionIdx].hash;
+        nextStartBlock = data.result[lastTransactionIdx].blockNumber;
+
+        getTransactions(wallet, nextStartBlock);
+      } else if (data.status === '0' && data.message === 'No transactions') {
+        alert('No transactions found from this block');
+        throw data.result;
       } else {
         throw data.result;
       }
-      setLoading(false);
     } catch (e) {
-      setLoading(false);
-      setErrorMsg(e);
+      console.log(e);
     }
   };
 
@@ -84,7 +91,6 @@ const App = () => {
             <Button
               required
               mt={1}
-              disabled={!wallet || loading}
               onClick={() => getTransactions(wallet, startBlock)}
             >
               Get Transactions
@@ -93,28 +99,7 @@ const App = () => {
         </Box>
       </Flex>
 
-      <Box width={1} height={'75vh'} m={1}>
-        {errorMsg ? (
-          <ToastMessage.Failure
-            my={3}
-            message={errorMsg}
-            secondaryMessage={'Please provide a valid wallet address'}
-          />
-        ) : null}
-        {loading ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: '250px'
-            }}
-          >
-            <Loader size="80px" />
-          </div>
-        ) : (
-          <CrawthTable data={transactions} />
-        )}
-      </Box>
+      <CrawthTable data={transactions} />
     </Box>
   );
 };
