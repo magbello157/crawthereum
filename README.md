@@ -21,6 +21,19 @@ or
 yarn
 ```
 
+### Setting up the environment variable file
+
+Crawthereum uses a free API service provided by [Etherscan.io](https://etherscan.io/) for which you need an API Key. Visit the website and create an account to get your free API Key. Then follow steps below to set up your environment variable
+
+- In the root directory, create a new `.env` file
+- Inside the `.env` file, paste in the following code while replacing "YOUR_API_KEY" with the API Key from [Etherscan.io](https://etherscan.io/)
+
+```
+REACT_APP_API_KEY=YOUR_API_KEY
+```
+
+- Save and close `.env` file.
+
 ### Starting the server
 
 - Run below command to start the dev server
