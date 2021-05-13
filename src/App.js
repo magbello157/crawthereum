@@ -31,16 +31,31 @@ const App = () => {
 
       if (data.status === '1' && data.message === 'OK') {
         const lastTransactionIdx = data.result.length - 1;
+        const lastTransaction = data.result[lastTransactionIdx];
 
-        if (lastTransactionHash === data.result[lastTransactionIdx].hash) {
+        if (lastTransactionHash === lastTransaction.hash) {
           alert('data fetch completed!');
           return;
         }
 
+        nextStartBlock = lastTransaction.blockNumber;
+
+        // Remove potentially duplicate transactions
+        for (let i = lastTransactionIdx; i >= 0; i--) {
+          if (data.result[i].blockNumber === nextStartBlock) {
+            data.result.pop();
+          } else {
+            break;
+          }
+        }
+
+        // Deliberately not re-using lastTransaction and lastTransactionIdx varialbles
+        // because lastTransactionHash should be set to the last transaction hash
+        // only after removal of potentially duplicate transactions
+        lastTransactionHash = data.result[data.result.length - 1].hash;
+
         setTransactions(transactions => [...transactions, ...data.result]);
         setQueriedWallet(wallet);
-        lastTransactionHash = data.result[lastTransactionIdx].hash;
-        nextStartBlock = data.result[lastTransactionIdx].blockNumber;
 
         getTransactions(wallet, nextStartBlock);
       } else if (data.status === '0' && data.message === 'No transactions') {
