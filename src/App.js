@@ -49,13 +49,24 @@ const App = () => {
           const lastTransaction = data.result[lastTransactionIdx];
 
           if (lastTransactionHash === lastTransaction.hash) {
+            setTransactions(transactions => [...transactions, ...data.result]);
             setLoading(false);
             setFetchComplete(true);
             return;
           }
 
           nextStartBlock = lastTransaction.blockNumber;
-          lastTransactionHash = data.result[data.result.length - 1].hash;
+          lastTransactionHash = lastTransaction.hash;
+
+          // Remove potentially duplicate transactions
+          for (let i = lastTransactionIdx; i >= 0; i--) {
+            if (data.result[i].blockNumber === nextStartBlock) {
+              data.result.pop();
+            } else {
+              break;
+            }
+          }
+
           setTransactions(transactions => [...transactions, ...data.result]);
           if (!queriedWallet) setQueriedWallet(wallet);
 

@@ -6,6 +6,10 @@ Crawthereum is a simple web app that displays transactions for a given Ethereum 
 
 ## Getting Started
 
+### Cloning the Repo
+
+- Clone this repository to your local machine
+
 ### Setting up the environment variable file
 
 Crawthereum uses a free API service provided by [Etherscan.io](https://etherscan.io/) for which you need an API Key. Visit the website and create an account to get your free API Key. Then follow steps below to set up your environment variable
@@ -21,7 +25,6 @@ REACT_APP_API_KEY=YOUR_API_KEY
 
 ### Installing
 
-- Clone this repository to your local machine
 - Install dependencies by running:
 
 ```
