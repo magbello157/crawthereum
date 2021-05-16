@@ -7,7 +7,10 @@ import {
   Flex,
   Heading,
   Input,
-  Text
+  Text,
+  Loader,
+  ToastMessage,
+  Pill
 } from 'rimble-ui';
 import CrawthTable from './components/CrawthTable';
 import axios from 'axios';
@@ -18,56 +21,54 @@ const App = () => {
   const [queriedWallet, setQueriedWallet] = useState('');
   const [startBlock, setStartBlock] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   let lastTransactionHash = '';
   let nextStartBlock = 0;
 
   const apiKey = process.env.REACT_APP_API_KEY;
 
-  const getTransactions = async (wallet, startBlock) => {
-    try {
-      const { data } = await axios.get(
-        `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=latest&sort=asc&apikey=${apiKey}`
-      );
+  function getTransactions() {
+    setLoading(true);
+    setFetchComplete(false);
+    setErrorMsg('');
+    setQueriedWallet('');
+    setTransactions([]);
 
-      if (data.status === '1' && data.message === 'OK') {
-        const lastTransactionIdx = data.result.length - 1;
-        const lastTransaction = data.result[lastTransactionIdx];
+    _getTransactions(wallet, startBlock);
 
-        if (lastTransactionHash === lastTransaction.hash) {
-          alert('data fetch completed!');
-          return;
-        }
+    async function _getTransactions(wallet, startBlock) {
+      try {
+        const { data } = await axios.get(
+          `https://api.etherscan.io/api?module=account&action=txlist&address=${wallet}&startblock=${startBlock}&endblock=latest&sort=asc&apikey=${apiKey}`
+        );
 
-        nextStartBlock = lastTransaction.blockNumber;
+        if (data.status === '1' && data.message === 'OK') {
+          const lastTransactionIdx = data.result.length - 1;
+          const lastTransaction = data.result[lastTransactionIdx];
 
-        // Remove potentially duplicate transactions
-        for (let i = lastTransactionIdx; i >= 0; i--) {
-          if (data.result[i].blockNumber === nextStartBlock) {
-            data.result.pop();
-          } else {
-            break;
+          if (lastTransactionHash === lastTransaction.hash) {
+            setLoading(false);
+            setFetchComplete(true);
+            return;
           }
+
+          nextStartBlock = lastTransaction.blockNumber;
+          lastTransactionHash = data.result[data.result.length - 1].hash;
+          setTransactions(transactions => [...transactions, ...data.result]);
+          if (!queriedWallet) setQueriedWallet(wallet);
+
+          _getTransactions(wallet, nextStartBlock);
+        } else {
+          throw data;
         }
-
-        // Deliberately not re-using lastTransaction and lastTransactionIdx varialbles
-        // because lastTransactionHash should be set to the last transaction hash
-        // only after removal of potentially duplicate transactions
-        lastTransactionHash = data.result[data.result.length - 1].hash;
-
-        setTransactions(transactions => [...transactions, ...data.result]);
-        setQueriedWallet(wallet);
-
-        getTransactions(wallet, nextStartBlock);
-      } else if (data.status === '0' && data.message === 'No transactions') {
-        alert('No transactions found from this block');
-        throw data.result;
-      } else {
-        throw data.result;
+      } catch (e) {
+        setLoading(false);
+        setErrorMsg(e);
       }
-    } catch (e) {
-      console.log(e);
     }
-  };
+  }
 
   return (
     <Box p={3} pt={0}>
@@ -90,6 +91,7 @@ const App = () => {
               required
               placeholder="e.g. 0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f"
               mr={2}
+              disabled={loading}
               onChange={e => setWallet(e.target.value)}
             />
           </Field>
@@ -99,6 +101,7 @@ const App = () => {
               required
               placeholder="e.g. 9000000"
               mr={1}
+              disabled={loading}
               onChange={e => setStartBlock(e.target.value)}
             />
           </Field>
@@ -106,6 +109,7 @@ const App = () => {
             <Button
               required
               mt={1}
+              disabled={wallet.length < 1 || loading}
               onClick={() => getTransactions(wallet, startBlock)}
             >
               Get Transactions
@@ -114,7 +118,48 @@ const App = () => {
         </Box>
       </Flex>
 
-      <CrawthTable data={transactions} />
+      <Box width={1} height={'75vh'} m={1}>
+        {errorMsg ? (
+          <ToastMessage.Failure
+            my={3}
+            message={errorMsg.message}
+            secondaryMessage={errorMsg.result}
+          />
+        ) : null}
+        {loading ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'right',
+              alignItems: 'center',
+              marginTop: '5px',
+              marginBottom: '20px',
+              marginRight: '30px'
+            }}
+          >
+            <Loader size="25px" marginRight="10px" />
+            <Text marginRight="80px">Fetching data...</Text>
+          </div>
+        ) : null}
+        {fetchComplete ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'right',
+              alignItems: 'center',
+              marginTop: '5px',
+              marginBottom: '20px',
+              marginRight: '30px'
+            }}
+          >
+            <Pill color="green" marginRight="10px">
+              Done
+            </Pill>
+            <Text marginRight="80px">Data fetch complete!</Text>
+          </div>
+        ) : null}
+        <CrawthTable data={transactions} />
+      </Box>
     </Box>
   );
 };
